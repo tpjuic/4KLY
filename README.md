@@ -36,7 +36,7 @@
 
 ## Features
 
-- **Download videos** from YouTube and 1000+ sites in MP4 (up to 720p)
+- **Download videos** from YouTube and 1,000+ sites in MP4 (up to 720p)
 - **Extract audio** as MP3 with one click
 - **Real-time progress** with video thumbnails, title, channel, speed, and ETA
 - **Batch downloads** — paste multiple URLs, downloads queue automatically
@@ -70,7 +70,7 @@ YTMac automatically downloads and manages [yt-dlp](https://github.com/yt-dlp/yt-
 
 ## Supported Sites
 
-YouTube, Vimeo, Twitter/X, Reddit, Instagram, TikTok, Dailymotion, Twitch, SoundCloud, and [1000+ more](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md).
+YouTube, Vimeo, Twitter/X, Reddit, Instagram, TikTok, Dailymotion, Twitch, SoundCloud, and [1,000+ more](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) (1,752 extractors total).
 
 ## Building from Source
 
