@@ -149,50 +149,72 @@ actor ProcessExecutor {
         }
     }
     
-    /// Fallback metadata extraction using --dump-json
+    /// Fallback metadata extraction using --dump-json (used for all non-YouTube sites)
     private func extractMetadataJSON(url: String) async -> VideoMetadata? {
         let process = Process()
         process.executableURL = binaryPath
-        process.arguments = ["--dump-json", "--no-download", url]
+        process.arguments = ["--dump-json", "--no-download", "--no-playlist", url]
         
         let stdoutPipe = Pipe()
         process.standardOutput = stdoutPipe
         process.standardError = Pipe()
         
-        do {
-            try process.run()
-            
-            let exitCode = await withCheckedContinuation { continuation in
-                process.terminationHandler = { proc in
-                    continuation.resume(returning: proc.terminationStatus)
-                }
+        // Set terminationHandler BEFORE run() to avoid race condition
+        let exitCode: Int32 = await withCheckedContinuation { continuation in
+            process.terminationHandler = { proc in
+                continuation.resume(returning: proc.terminationStatus)
             }
-            
-            guard exitCode == 0 else { return nil }
-            
-            let data = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-                return nil
+            do {
+                try process.run()
+            } catch {
+                continuation.resume(returning: -1)
             }
-            
-            let title = json["title"] as? String ?? ""
-            let thumbnail = (json["thumbnail"] as? String).flatMap { URL(string: $0) }
-            let channel = json["channel"] as? String ?? json["uploader"] as? String
-            let duration = json["duration"] as? Int
-            let fileSize = json["filesize"] as? Int64 ?? json["filesize_approx"] as? Int64
-            
-            guard !title.isEmpty else { return nil }
-            
-            return VideoMetadata(
-                title: title,
-                thumbnailURL: thumbnail,
-                channelName: channel,
-                duration: duration,
-                fileSize: fileSize
-            )
-        } catch {
+        }
+        
+        guard exitCode == 0 else { return nil }
+        
+        let data = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return nil
         }
+        
+        let title = json["title"] as? String ?? ""
+        guard !title.isEmpty else { return nil }
+        
+        // "thumbnail" is the best single thumbnail URL yt-dlp picks
+        let thumbnail = (json["thumbnail"] as? String).flatMap { URL(string: $0) }
+        
+        let channel = json["channel"] as? String ?? json["uploader"] as? String
+        
+        // duration comes as Double from yt-dlp (e.g. 64.027)
+        let duration: Int?
+        if let d = json["duration"] as? Double {
+            duration = Int(d)
+        } else if let d = json["duration"] as? Int {
+            duration = d
+        } else {
+            duration = nil
+        }
+        
+        // filesize_approx is Int64 or Double depending on site
+        let fileSize: Int64?
+        if let fs = json["filesize_approx"] as? Int64 {
+            fileSize = fs
+        } else if let fs = json["filesize_approx"] as? Double {
+            fileSize = Int64(fs)
+        } else if let fs = json["filesize"] as? Int64 {
+            fileSize = fs
+        } else {
+            fileSize = nil
+        }
+        
+        return VideoMetadata(
+            title: title,
+            thumbnailURL: thumbnail,
+            channelName: channel,
+            duration: duration,
+            fileSize: fileSize
+        )
     }
     
     /// Executes yt-dlp to download a video with specified quality and progress tracking.
