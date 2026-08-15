@@ -56,3 +56,12 @@ Icon
 
 # Data files
 data/
+
+# Code signing - contains personal team ID, configure locally
+ExportOptions.plist
+
+# Local workspace file - references local paths not relevant to others
+*.code-workspace
+
+# Screenshots
+screenshots/
