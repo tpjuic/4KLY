@@ -138,11 +138,7 @@ struct HistoryView: View {
         ScrollView {
             LazyVStack(spacing: DesignConstants.relatedSpacing) {
                 ForEach(filteredItems) { item in
-                    HistoryCardView(item: item) {
-                        Task {
-                            await viewModel.redownload(item: item)
-                        }
-                    }
+                    HistoryCardView(item: item)
                     .transition(.opacity.combined(with: .scale))
                     .contextMenu {
                         Button(role: .destructive) {

@@ -55,7 +55,8 @@ class HistoryViewModel: ObservableObject {
         }
         
         do {
-            historyItems = try historyStore.fetchAll()
+            // Only show successfully completed downloads in history
+            historyItems = try historyStore.fetchAll().filter { $0.status == "completed" }
         } catch {
             errorMessage = "Failed to load history: \(error.localizedDescription)"
             historyItems = []

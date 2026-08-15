@@ -20,9 +20,6 @@ struct HistoryCardView: View {
     /// The download history item to display
     let item: DownloadHistoryItem
 
-    /// Callback invoked when the user taps the retry/re-download button
-    let onRedownload: () -> Void
-
     // MARK: - Body
 
     var body: some View {
@@ -54,12 +51,8 @@ struct HistoryCardView: View {
                         .foregroundColor(.secondary)
                 }
 
-                // Status-specific content
-                if isCompleted {
-                    completedActions
-                } else {
-                    failedActions
-                }
+                // Status-specific content — only completed items show here
+                completedActions
             }
 
             Spacer(minLength: 0)
@@ -194,40 +187,7 @@ struct HistoryCardView: View {
         }
     }
 
-    // MARK: - Failed Actions
-
-    /// Prominent retry button for failed downloads
-    private var failedActions: some View {
-        VStack(alignment: .leading, spacing: DesignConstants.relatedSpacing) {
-            if let errorMessage = item.errorMessage {
-                Text(errorMessage)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
-
-            Button {
-                onRedownload()
-            } label: {
-                Label("Retry Download", systemImage: "arrow.clockwise")
-                    .font(.caption)
-                    .fontWeight(.medium)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
-            .controlSize(.small)
-            .accessibilityLabel("Retry download")
-            .accessibilityHint("Attempts to download this video again")
-        }
-    }
-
     // MARK: - Helpers
-
-    /// Whether the history item represents a completed download
-    private var isCompleted: Bool {
-        item.status == "completed"
-    }
-
     /// Extracts YouTube thumbnail URL from the video URL
     private var youTubeThumbnailURL: URL? {
         guard let components = URLComponents(string: item.url) else { return nil }
@@ -292,9 +252,8 @@ struct HistoryCardView: View {
 
     /// Accessibility description for the entire card
     private var accessibilityDescription: String {
-        let status = isCompleted ? "Completed" : "Failed"
         let title = item.title.isEmpty ? item.url : item.title
-        return "\(title), \(qualityLabel), \(status), \(relativeDate)"
+        return "\(title), \(qualityLabel), \(relativeDate)"
     }
 }
 
@@ -310,24 +269,7 @@ struct HistoryCardView: View {
             status: "completed",
             createdAt: Date().addingTimeInterval(-3600),
             completedAt: Date().addingTimeInterval(-1800)
-        ),
-        onRedownload: {}
-    )
-    .frame(width: 500)
-    .padding()
-}
-
-#Preview("Failed Download") {
-    HistoryCardView(
-        item: DownloadHistoryItem(
-            url: "https://www.youtube.com/watch?v=invalid",
-            title: "Unavailable Video - This Title Is Quite Long",
-            quality: "480p (Standard)",
-            status: "failed",
-            errorMessage: "This video is unavailable. Please check the URL and try again.",
-            createdAt: Date().addingTimeInterval(-7200)
-        ),
-        onRedownload: {}
+        )
     )
     .frame(width: 500)
     .padding()
@@ -342,8 +284,7 @@ struct HistoryCardView: View {
             status: "completed",
             createdAt: Date().addingTimeInterval(-86400),
             completedAt: Date().addingTimeInterval(-86000)
-        ),
-        onRedownload: {}
+        )
     )
     .frame(width: 500)
     .padding()
@@ -359,8 +300,7 @@ struct HistoryCardView: View {
             status: "completed",
             createdAt: Date().addingTimeInterval(-600),
             completedAt: Date()
-        ),
-        onRedownload: {}
+        )
     )
     .frame(width: 500)
     .padding()
