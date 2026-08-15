@@ -82,19 +82,33 @@ actor ProcessExecutor {
         let fileSize: Int64?
     }
     
-    /// Extracts video metadata using YouTube oEmbed API (fast, reliable) with yt-dlp fallback.
+    /// Extracts video metadata using YouTube oEmbed API (fast) or yt-dlp --dump-json (all other sites).
     ///
     /// - Parameter url: The video URL to extract metadata from
     /// - Returns: VideoMetadata with title, thumbnail, channel, duration, and estimated size
     func extractMetadata(url: String) async -> VideoMetadata? {
-        // Try YouTube oEmbed API first (fast and reliable, works even with old yt-dlp)
+        // Try YouTube oEmbed API first (instant, no yt-dlp needed)
         if let oembedResult = await extractViaOEmbed(url: url) {
             return oembedResult
         }
         
-        // For non-YouTube URLs, skip yt-dlp metadata (too slow/unreliable with outdated versions)
-        // The download will still work, just without a title preview
-        return nil
+        // For non-YouTube URLs, use yt-dlp --dump-json with a 10-second timeout
+        // so the UI doesn't hang indefinitely for unsupported sites
+        return await withTaskGroup(of: VideoMetadata?.self) { group in
+            group.addTask {
+                await self.extractMetadataJSON(url: url)
+            }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(10))
+                return nil
+            }
+            // Return whichever finishes first — metadata or timeout nil
+            for await result in group {
+                group.cancelAll()
+                return result
+            }
+            return nil
+        }
     }
     
     /// Extracts metadata via YouTube oEmbed API (no yt-dlp needed)
