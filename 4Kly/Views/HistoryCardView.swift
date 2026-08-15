@@ -1,6 +1,6 @@
 //
 //  HistoryCardView.swift
-//  YTMac
+//  4Kly
 //
 //  A card-styled history row with thumbnail placeholder, quality badge,
 //  relative date, and contextual action buttons.

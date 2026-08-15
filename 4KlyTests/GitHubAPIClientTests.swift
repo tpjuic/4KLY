@@ -1,6 +1,6 @@
 //
 //  GitHubAPIClientTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Tests for GitHubAPIClient functionality
 //

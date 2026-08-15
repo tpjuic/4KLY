@@ -1,6 +1,6 @@
 //
 //  DownloadFormat.swift
-//  YTMac
+//  4Kly
 //
 //  Output format selection for downloads (MP4 video or MP3 audio-only)
 //

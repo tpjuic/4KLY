@@ -1,8 +1,8 @@
 //
 //  Errors.swift
-//  YTMac
+//  4Kly
 //
-//  Error definitions for YTMac application.
+//  Error definitions for 4Kly application.
 //  Validates Requirements: 11.1, 11.2, 11.3, 11.5
 //
 

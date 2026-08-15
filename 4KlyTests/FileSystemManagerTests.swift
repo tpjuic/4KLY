@@ -1,8 +1,8 @@
 //
 //  FileSystemManagerTests.swift
-//  YTMacTests
+//  4KlyTests
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //
 
 import XCTest
@@ -24,8 +24,8 @@ final class FileSystemManagerTests: XCTestCase {
         let appSupportURL = try fileSystemManager.ensureAppSupportDirectory()
         
         // Then
-        XCTAssertTrue(appSupportURL.path.hasSuffix("Library/Application Support/YTMac"),
-                     "Should return path ending with Library/Application Support/YTMac")
+        XCTAssertTrue(appSupportURL.path.hasSuffix("Library/Application Support/4Kly"),
+                     "Should return path ending with Library/Application Support/4Kly")
         XCTAssertTrue(FileManager.default.fileExists(atPath: appSupportURL.path),
                      "Directory should exist after calling ensureAppSupportDirectory")
     }
@@ -61,8 +61,8 @@ final class FileSystemManagerTests: XCTestCase {
         let logsURL = try fileSystemManager.ensureLogsDirectory()
         
         // Then
-        XCTAssertTrue(logsURL.path.hasSuffix("Library/Logs/YTMac"),
-                     "Should return path ending with Library/Logs/YTMac")
+        XCTAssertTrue(logsURL.path.hasSuffix("Library/Logs/4Kly"),
+                     "Should return path ending with Library/Logs/4Kly")
         XCTAssertTrue(FileManager.default.fileExists(atPath: logsURL.path),
                      "Directory should exist after calling ensureLogsDirectory")
     }

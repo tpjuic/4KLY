@@ -1,6 +1,6 @@
 //
 //  MainView.swift
-//  YTMac
+//  4Kly
 //
 //  Main download interface view - the primary screen users interact with.
 //  Implements Requirements: 1.1, 2.2, 4.4, 5.5, 7.1, 7.3, 7.4, 7.5

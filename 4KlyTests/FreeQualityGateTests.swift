@@ -1,6 +1,6 @@
 //
 //  FreeQualityGateTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Tests for FreeQualityGate actor implementation.
 //  Validates Requirements 2.4, 2.6, 2.7, 10.2, 12.1

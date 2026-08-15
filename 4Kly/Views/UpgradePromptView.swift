@@ -1,6 +1,6 @@
 //
 //  UpgradePromptView.swift
-//  YTMac
+//  4Kly
 //
 //  Premium upgrade prompt sheet with feature comparison and gradient CTA.
 //  Implements Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6

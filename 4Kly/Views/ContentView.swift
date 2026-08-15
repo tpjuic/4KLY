@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  YTMac
+//  4Kly
 //
 //  Main application content view with NavigationSplitView
 //  Implements Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 9.1, 9.3, 9.4, 9.5

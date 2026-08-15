@@ -1,14 +1,14 @@
 //
 //  Logger.swift
-//  YTMac
+//  4Kly
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //  Validates Requirements: 10.5, 11.6
 //
 
 import Foundation
 
-/// Logging utility for YTMac application
+/// Logging utility for 4Kly application
 /// Provides centralized logging to file and console with multiple log levels
 class Logger {
     /// Shared singleton instance
@@ -33,7 +33,7 @@ class Logger {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         
-        // Initialize log file at ~/Library/Logs/YTMac/4kly.log
+        // Initialize log file at ~/Library/Logs/4Kly/4kly.log
         if let logsDir = try? FileSystemManager.shared.ensureLogsDirectory() {
             logFileURL = logsDir.appendingPathComponent("4kly.log")
             

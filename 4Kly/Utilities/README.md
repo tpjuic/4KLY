@@ -1,15 +1,15 @@
 # Utilities
 
-This directory contains utility classes and helpers for YTMac.
+This directory contains utility classes and helpers for 4Kly.
 
 ## FileSystemManager
 
-Manages file system operations for YTMac application directories.
+Manages file system operations for 4Kly application directories.
 
 ### Features
 
-- **ensureAppSupportDirectory()**: Returns `~/Library/Application Support/YTMac`, creating it with intermediate directories if needed
-- **ensureLogsDirectory()**: Returns `~/Library/Logs/YTMac`, creating it with intermediate directories if needed
+- **ensureAppSupportDirectory()**: Returns `~/Library/Application Support/4Kly`, creating it with intermediate directories if needed
+- **ensureLogsDirectory()**: Returns `~/Library/Logs/4Kly`, creating it with intermediate directories if needed
 
 ### Usage
 
@@ -73,7 +73,7 @@ Thread-safe singleton logger for application-wide logging with file and console 
 - **Dual output**: Writes to file and console (console only in DEBUG builds)
 - **Automatic context**: Captures file, function, and line number
 - **Formatted timestamps**: ISO-style timestamps with milliseconds
-- **Log file location**: `~/Library/Logs/YTMac/ytmac.log`
+- **Log file location**: `~/Library/Logs/4Kly/ytmac.log`
 
 ### Usage
 

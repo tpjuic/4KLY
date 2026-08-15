@@ -1,6 +1,6 @@
 //
 //  DownloadHistoryStore.swift
-//  YTMac
+//  4Kly
 //
 //  SwiftData-based persistence service for download history.
 //  Implements Requirements 6.1, 6.2, 6.4, 6.5, 6.6

@@ -1,6 +1,6 @@
 //
 //  BinaryUpdaterTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Tests for BinaryUpdater actor
 //  Validates Requirements: 3.1, 3.2

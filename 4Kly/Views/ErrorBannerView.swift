@@ -1,6 +1,6 @@
 //
 //  ErrorBannerView.swift
-//  YTMac
+//  4Kly
 //
 //  A dismissible error banner with auto-dismiss timer.
 //  Implements Requirements: 11.2, 11.3, 11.4

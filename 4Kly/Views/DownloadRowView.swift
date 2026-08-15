@@ -1,6 +1,6 @@
 //
 //  DownloadRowView.swift
-//  YTMac
+//  4Kly
 //
 //  A card-style row view displaying a download job with thumbnail, metadata,
 //  progress bar, and status information.

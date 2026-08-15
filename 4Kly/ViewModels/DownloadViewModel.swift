@@ -1,6 +1,6 @@
 //
 //  DownloadViewModel.swift
-//  YTMac
+//  4Kly
 //
 //  ViewModel for download management UI
 //  Implements Requirements: 1.1, 2.2, 4.4, 4.7, 5.5, 5.6, 10.2, 10.5

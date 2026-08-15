@@ -1,6 +1,6 @@
 //
 //  OnboardingPermissionView.swift
-//  YTMac
+//  4Kly
 //
 //  First-launch sheet for folder permission request.
 //  Implements Requirements: 9.1, 9.2, 9.3, 9.4, 9.5

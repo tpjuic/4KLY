@@ -1,8 +1,8 @@
 //
 //  LoggerTests.swift
-//  YTMacTests
+//  4KlyTests
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //  Tests for Logger singleton
 //
 

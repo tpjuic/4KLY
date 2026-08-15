@@ -1,8 +1,8 @@
 //
 //  PathValidator.swift
-//  YTMac
+//  4Kly
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //  Validates Requirements: 8.3, 11.4
 //
 

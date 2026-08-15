@@ -1,6 +1,6 @@
 # Code Signing Configuration Guide
 
-This guide explains how to configure code signing for YTMac so the app can be distributed without macOS Gatekeeper warnings.
+This guide explains how to configure code signing for 4Kly so the app can be distributed without macOS Gatekeeper warnings.
 
 ## Prerequisites
 
@@ -10,9 +10,9 @@ This guide explains how to configure code signing for YTMac so the app can be di
 
 ## 1. Configure Code Signing in Xcode
 
-1. Open `YTMac.xcodeproj` in Xcode
-2. Select the **YTMac** project in the Navigator (left sidebar)
-3. Select the **YTMac** target
+1. Open `4Kly.xcodeproj` in Xcode
+2. Select the **4Kly** project in the Navigator (left sidebar)
+3. Select the **4Kly** target
 4. Go to the **Signing & Capabilities** tab
 
 ## 2. Set the Development Team
@@ -42,13 +42,13 @@ After configuring the team and automatic signing:
 To verify from the command line after building:
 
 ```bash
-codesign --verify --deep --strict /path/to/YTMac.app
-codesign -dv --verbose=4 /path/to/YTMac.app
+codesign --verify --deep --strict /path/to/4Kly.app
+codesign -dv --verbose=4 /path/to/4Kly.app
 ```
 
 ## 5. Configure Developer ID Certificate for Distribution
 
-For distributing YTMac outside the Mac App Store (e.g., via GitHub DMG releases):
+For distributing 4Kly outside the Mac App Store (e.g., via GitHub DMG releases):
 
 ### Create a Developer ID Certificate
 
@@ -67,9 +67,9 @@ When building for distribution:
 
 ```bash
 xcodebuild archive \
-  -project YTMac.xcodeproj \
-  -scheme YTMac \
-  -archivePath ./build/YTMac.xcarchive \
+  -project 4Kly.xcodeproj \
+  -scheme 4Kly \
+  -archivePath ./build/4Kly.xcarchive \
   CODE_SIGN_IDENTITY="Developer ID Application: Your Name (TEAM_ID)" \
   DEVELOPMENT_TEAM="YOUR_TEAM_ID"
 ```
@@ -81,19 +81,19 @@ After archiving, notarize the app to avoid Gatekeeper warnings:
 ```bash
 # Export the archive
 xcodebuild -exportArchive \
-  -archivePath ./build/YTMac.xcarchive \
+  -archivePath ./build/4Kly.xcarchive \
   -exportPath ./build/export \
   -exportOptionsPlist ExportOptions.plist
 
 # Submit for notarization
-xcrun notarytool submit ./build/export/YTMac.app.zip \
+xcrun notarytool submit ./build/export/4Kly.app.zip \
   --apple-id "your@email.com" \
   --team-id "YOUR_TEAM_ID" \
   --password "app-specific-password" \
   --wait
 
 # Staple the notarization ticket
-xcrun stapler staple ./build/export/YTMac.app
+xcrun stapler staple ./build/export/4Kly.app
 ```
 
 ## Troubleshooting
@@ -109,4 +109,4 @@ xcrun stapler staple ./build/export/YTMac.app
 
 - Code signing requires credentials specific to each developer — this cannot be automated in the repository
 - For CI/CD pipelines, store certificates in GitHub Secrets and use `fastlane match` or manual keychain setup
-- The app's entitlements file (`YTMac.entitlements`) is already configured with the necessary sandbox permissions
+- The app's entitlements file (`4Kly.entitlements`) is already configured with the necessary sandbox permissions

@@ -1,19 +1,19 @@
 //
 //  FileSystemManager.swift
-//  YTMac
+//  4Kly
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //
 
 import Foundation
 
-/// Manages file system operations for YTMac application directories
+/// Manages file system operations for 4Kly application directories
 class FileSystemManager {
     static let shared = FileSystemManager()
     
     private init() {}
     
-    /// Returns the path to ~/Library/Application Support/YTMac, creating it if necessary
+    /// Returns the path to ~/Library/Application Support/4Kly, creating it if necessary
     /// - Returns: URL pointing to the application support directory
     /// - Throws: FileSystemError if directory creation fails
     func ensureAppSupportDirectory() throws -> URL {
@@ -39,7 +39,7 @@ class FileSystemManager {
         return ytmacDir
     }
     
-    /// Returns the path to ~/Library/Logs/YTMac, creating it if necessary
+    /// Returns the path to ~/Library/Logs/4Kly, creating it if necessary
     /// - Returns: URL pointing to the logs directory
     /// - Throws: FileSystemError if directory creation fails
     func ensureLogsDirectory() throws -> URL {

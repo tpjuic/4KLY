@@ -1,6 +1,6 @@
 //
 //  SettingsViewModel.swift
-//  YTMac
+//  4Kly
 //
 //  ViewModel for settings UI
 //  Implements Requirements: 8.1, 8.3, 8.4, 3.6, 13.1

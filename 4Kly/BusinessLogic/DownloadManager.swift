@@ -1,6 +1,6 @@
 //
 //  DownloadManager.swift
-//  YTMac
+//  4Kly
 //
 //  Actor responsible for orchestrating download lifecycle, managing concurrent execution,
 //  and coordinating with QualityGate and ProcessExecutor.

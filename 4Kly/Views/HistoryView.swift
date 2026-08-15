@@ -1,6 +1,6 @@
 //
 //  HistoryView.swift
-//  YTMac
+//  4Kly
 //
 //  View displaying download history with clear functionality
 //  Implements Requirements: 6.1, 6.3, 6.5, 7.1, 7.4, 7.5, 10.2, 10.3, 10.4, 13.1

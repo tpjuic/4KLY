@@ -1,6 +1,6 @@
 //
 //  ProgressParser.swift
-//  YTMac
+//  4Kly
 //
 //  Parses yt-dlp progress output strings to extract download progress information.
 //  Validates Requirements: 4.3

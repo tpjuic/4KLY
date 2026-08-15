@@ -1,8 +1,8 @@
 //
 //  DownloadProgress.swift
-//  YTMac
+//  4Kly
 //
-//  Created by YTMac Developer
+//  Created by 4Kly Developer
 //
 
 import Foundation

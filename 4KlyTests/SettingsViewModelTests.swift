@@ -1,6 +1,6 @@
 //
 //  SettingsViewModelTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Unit tests for SettingsViewModel
 //  Validates: Requirements 8.1, 8.3, 8.4

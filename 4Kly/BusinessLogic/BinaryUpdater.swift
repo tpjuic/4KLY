@@ -1,6 +1,6 @@
 //
 //  BinaryUpdater.swift
-//  YTMac
+//  4Kly
 //
 //  Created for yt-dlp binary management
 //

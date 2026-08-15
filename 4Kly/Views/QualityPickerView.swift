@@ -1,6 +1,6 @@
 //
 //  QualityPickerView.swift
-//  YTMac
+//  4Kly
 //
 //  Picker displaying video quality options with premium badges
 //  Implements Requirements: 2.2, 7.4

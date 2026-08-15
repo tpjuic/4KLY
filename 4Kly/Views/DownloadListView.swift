@@ -1,6 +1,6 @@
 //
 //  DownloadListView.swift
-//  YTMac
+//  4Kly
 //
 //  List view displaying downloads with filter tabs (All, Downloading, Queued, Completed)
 //  Implements Requirements: 5.5, 5.6, 7.4

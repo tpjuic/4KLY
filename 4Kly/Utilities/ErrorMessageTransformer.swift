@@ -1,6 +1,6 @@
 //
 //  ErrorMessageTransformer.swift
-//  YTMac
+//  4Kly
 //
 //  Transforms raw yt-dlp error messages into user-friendly strings.
 //  Validates Requirements: 11.2, 11.3, 11.5

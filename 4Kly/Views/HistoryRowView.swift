@@ -1,6 +1,6 @@
 //
 //  HistoryRowView.swift
-//  YTMac
+//  4Kly
 //
 //  A row view displaying a single download history item with status, details, and actions.
 //  Implements Requirements: 6.3, 6.6, 7.4

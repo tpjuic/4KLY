@@ -1,6 +1,6 @@
 //
 //  DownloadViewModelTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Unit tests for DownloadViewModel submitDownload() method
 //  Validates: Requirements 1.2, 1.3, 1.4, 2.3, 5.1

@@ -1,6 +1,6 @@
 //
 //  ConfigurationService.swift
-//  YTMac
+//  4Kly
 //
 //  Configuration service for managing application settings and preferences.
 //  Implements Requirements 8.2, 8.3, 8.4, 10.1, 10.3

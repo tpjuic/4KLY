@@ -1,6 +1,6 @@
 //
 //  QualityGate.swift
-//  YTMac
+//  4Kly
 //
 //  Protocol and supporting types for quality validation strategy.
 //  Implements Requirements 2.4, 2.5, 10.2, 12.1, 12.2

@@ -1,6 +1,6 @@
 //
 //  URLInputView.swift
-//  YTMac
+//  4Kly
 //
 //  Text input component for video URL(s) with multi-line support for batch downloads
 //  Implements Requirements: 1.1, 7.4

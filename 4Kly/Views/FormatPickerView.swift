@@ -1,6 +1,6 @@
 //
 //  FormatPickerView.swift
-//  YTMac
+//  4Kly
 //
 //  Picker for selecting download output format (MP4 video or MP3 audio)
 //

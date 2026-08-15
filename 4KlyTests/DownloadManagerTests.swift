@@ -1,6 +1,6 @@
 //
 //  DownloadManagerTests.swift
-//  YTMacTests
+//  4KlyTests
 //
 //  Tests for DownloadManager actor implementation.
 //  Validates Requirements 1.3, 2.3, 2.4, 4.1, 5.1, 5.2, 5.3, 5.4
