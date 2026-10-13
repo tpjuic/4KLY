@@ -320,7 +320,8 @@ actor DownloadManager {
             let processResult = ProcessResult(
                 exitCode: -1,
                 outputPath: nil,
-                error: error.localizedDescription
+                error: error.localizedDescription,
+                actualHeight: nil
             )
             await handleDownloadCompletion(updatedJob, result: processResult)
         }
@@ -374,6 +375,9 @@ actor DownloadManager {
             // Success: update job status to .completed with output path
             updatedJob.status = .completed(path: result.outputPath ?? configService.downloadLocation)
             updatedJob.outputPath = result.outputPath
+            
+            // Store actual downloaded height (may differ from requested for non-YouTube sites)
+            updatedJob.actualHeight = result.actualHeight
         } else {
             // Failure: update job status to .failed with error message
             let errorMessage = result.error ?? "Download failed with exit code \(result.exitCode)"

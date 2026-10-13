@@ -124,7 +124,7 @@ struct DownloadListView: View {
     // MARK: - Empty States
     
     private var emptyStateView: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             Image(systemName: "arrow.down.circle")
                 .font(.system(size: DesignConstants.emptyStateIconSize))
                 .foregroundColor(.secondary)
@@ -136,10 +136,42 @@ struct DownloadListView: View {
             Text("Paste a video URL above to start downloading")
                 .font(.subheadline)
                 .foregroundColor(.secondary.opacity(0.7))
+            
+            // Platform logos
+            supportedPlatformsView
+                .padding(.top, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("No downloads in progress")
+    }
+    
+    /// Row of supported platform logos
+    private var supportedPlatformsView: some View {
+        VStack(spacing: 16) {
+            // First row
+            HStack(spacing: 24) {
+                YouTubeLogo()
+                SoundCloudLogo()
+                FacebookLogo()
+                VimeoLogo()
+                TikTokLogo()
+            }
+            
+            // Second row
+            HStack(spacing: 24) {
+                TwitchLogo()
+                DailymotionLogo()
+                InstagramLogo()
+                TwitterLogo()
+                RedditLogo()
+            }
+            
+            Text("+ more sites")
+                .font(.caption2)
+                .foregroundColor(.secondary.opacity(0.4))
+                .padding(.top, 8)
+        }
     }
     
     private var filteredEmptyView: some View {
@@ -180,67 +212,4 @@ struct DownloadListView: View {
         onCancel: { _ in }
     )
     .frame(width: 600, height: 400)
-}
-
-#Preview("With Downloads") {
-    let activeJobs = [
-        DownloadJobViewModel(from: DownloadJob(
-            id: UUID(),
-            url: "https://www.youtube.com/watch?v=abc123",
-            title: "Sample Video 1",
-            quality: .standard720p,
-            status: .active(progress: DownloadProgress(
-                percentage: 0.45,
-                downloadedBytes: 23_000_000,
-                totalBytes: 51_000_000,
-                speed: 2_500_000,
-                eta: 12
-            )),
-            progress: DownloadProgress(
-                percentage: 0.45,
-                downloadedBytes: 23_000_000,
-                totalBytes: 51_000_000,
-                speed: 2_500_000,
-                eta: 12
-            ),
-            createdAt: Date(),
-            thumbnailURL: URL(string: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"),
-            channelName: "Test Channel",
-            duration: 213,
-            fileSize: 51_000_000
-        ))
-    ]
-    
-    let queuedJobs = [
-        DownloadJobViewModel(from: DownloadJob(
-            id: UUID(),
-            url: "https://www.youtube.com/watch?v=def456",
-            title: "Sample Video 2",
-            quality: .standard480p,
-            status: .queued,
-            channelName: "Another Channel",
-            duration: 300
-        ))
-    ]
-    
-    let completedJobs = [
-        DownloadJobViewModel(from: DownloadJob(
-            id: UUID(),
-            url: "https://www.youtube.com/watch?v=ghi789",
-            title: "Completed Video",
-            quality: .standard720p,
-            status: .completed(path: URL(fileURLWithPath: "/tmp/video.mp4")),
-            channelName: "Done Channel",
-            duration: 180,
-            fileSize: 45_000_000
-        ))
-    ]
-    
-    DownloadListView(
-        activeDownloads: activeJobs,
-        queuedDownloads: queuedJobs,
-        completedDownloads: completedJobs,
-        onCancel: { _ in }
-    )
-    .frame(width: 600, height: 500)
 }

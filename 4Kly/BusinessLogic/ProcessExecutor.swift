@@ -8,101 +8,45 @@
 import Foundation
 
 /// Result of a yt-dlp subprocess execution.
-///
-/// This struct encapsulates all information about the outcome of running
-/// yt-dlp as a subprocess, including success/failure status, output location,
-/// and any error messages captured from stderr.
 struct ProcessResult: Codable {
-    /// The exit code returned by the yt-dlp process.
-    ///
-    /// - A value of 0 indicates successful execution
-    /// - Non-zero values indicate errors or failures
     let exitCode: Int32
-    
-    /// The file system path to the downloaded video file.
-    ///
-    /// This value is `nil` when:
-    /// - The download failed (exitCode != 0)
-    /// - The process was interrupted or cancelled
-    /// - yt-dlp did not produce an output file
     let outputPath: URL?
-    
-    /// Error message captured from the process stderr stream.
-    ///
-    /// This value is `nil` when:
-    /// - The download completed successfully (exitCode == 0)
-    /// - No error output was produced by yt-dlp
-    ///
-    /// When populated, this typically contains yt-dlp error messages
-    /// that can be transformed into user-friendly feedback.
     let error: String?
+    let actualHeight: Int?
 }
 
-/// Actor responsible for executing yt-dlp as a subprocess with progress tracking.
-///
-/// ProcessExecutor handles the lifecycle of yt-dlp subprocess execution, including:
-/// - Command construction with appropriate flags for quality and format
-/// - Real-time progress parsing from stdout
-/// - Error handling and stderr capture
-/// - Process cancellation support
-///
-/// Thread-safety is guaranteed by the actor model, ensuring that concurrent
-/// download operations do not interfere with each other.
-///
-/// Validates Requirements: 4.1, 4.2, 4.3, 4.4, 15.1, 15.2
 actor ProcessExecutor {
     
-    // MARK: - Properties
-    
-    /// Path to the yt-dlp binary executable
     private let binaryPath: URL
-    
-    /// Progress parser for extracting download progress from yt-dlp output
     private let progressParser = ProgressParser()
-    
-    /// Active process references for cancellation support
     private var activeProcesses: [Int32: Process] = [:]
     
-    // MARK: - Initialization
-    
-    /// Creates a new ProcessExecutor with the specified yt-dlp binary path.
-    /// - Parameter binaryPath: URL to the yt-dlp binary executable
     init(binaryPath: URL) {
         self.binaryPath = binaryPath
     }
     
-    // MARK: - Public API
-    
-    /// Video metadata extracted from yt-dlp --dump-json
     struct VideoMetadata {
         let title: String
         let thumbnailURL: URL?
         let channelName: String?
         let duration: Int?
         let fileSize: Int64?
+        let actualHeight: Int?
     }
     
-    /// Extracts video metadata using YouTube oEmbed API (fast) or yt-dlp --dump-json (all other sites).
-    ///
-    /// - Parameter url: The video URL to extract metadata from
-    /// - Returns: VideoMetadata with title, thumbnail, channel, duration, and estimated size
     func extractMetadata(url: String) async -> VideoMetadata? {
-        // Try YouTube oEmbed API first (instant, no yt-dlp needed)
         if let oembedResult = await extractViaOEmbed(url: url) {
             return oembedResult
         }
         
-        // For non-YouTube URLs, use yt-dlp --dump-json with a 10-second timeout
-        // so the UI doesn't hang indefinitely for unsupported sites
         return await withTaskGroup(of: VideoMetadata?.self) { group in
             group.addTask {
                 await self.extractMetadataJSON(url: url)
             }
             group.addTask {
-                try? await Task.sleep(for: .seconds(10))
+                try? await Task.sleep(for: .seconds(30))
                 return nil
             }
-            // Return whichever finishes first — metadata or timeout nil
             for await result in group {
                 group.cancelAll()
                 return result
@@ -111,9 +55,7 @@ actor ProcessExecutor {
         }
     }
     
-    /// Extracts metadata via YouTube oEmbed API (no yt-dlp needed)
     private func extractViaOEmbed(url: String) async -> VideoMetadata? {
-        // Only works for YouTube URLs
         guard url.contains("youtube.com") || url.contains("youtu.be") else { return nil }
         
         let encodedURL = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? url
@@ -141,25 +83,30 @@ actor ProcessExecutor {
                 title: title,
                 thumbnailURL: thumbnail,
                 channelName: channel,
-                duration: nil,  // oEmbed doesn't provide duration
-                fileSize: nil   // oEmbed doesn't provide file size
+                duration: nil,
+                fileSize: nil,
+                actualHeight: nil
             )
         } catch {
             return nil
         }
     }
     
-    /// Fallback metadata extraction using --dump-json (used for all non-YouTube sites)
     private func extractMetadataJSON(url: String) async -> VideoMetadata? {
+        guard FileManager.default.fileExists(atPath: binaryPath.path) else {
+            Logger.shared.log("yt-dlp binary not found at: \(binaryPath.path)", level: .error)
+            return nil
+        }
+        
         let process = Process()
         process.executableURL = binaryPath
         process.arguments = ["--dump-json", "--no-download", "--no-playlist", url]
         
         let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
         process.standardOutput = stdoutPipe
-        process.standardError = Pipe()
+        process.standardError = stderrPipe
         
-        // Set terminationHandler BEFORE run() to avoid race condition
         let exitCode: Int32 = await withCheckedContinuation { continuation in
             process.terminationHandler = { proc in
                 continuation.resume(returning: proc.terminationStatus)
@@ -167,26 +114,39 @@ actor ProcessExecutor {
             do {
                 try process.run()
             } catch {
+                Logger.shared.log("Failed to run yt-dlp for metadata: \(error.localizedDescription)", level: .error)
                 continuation.resume(returning: -1)
             }
         }
         
-        guard exitCode == 0 else { return nil }
+        if exitCode != 0 {
+            let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+            let stderrStr = String(data: stderrData, encoding: .utf8) ?? ""
+            Logger.shared.log("yt-dlp metadata extraction failed with exit code \(exitCode): \(stderrStr)", level: .warning)
+            return nil
+        }
         
         let data = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        guard !data.isEmpty else {
+            Logger.shared.log("yt-dlp returned empty stdout for metadata", level: .warning)
+            return nil
+        }
+        
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            Logger.shared.log("Failed to parse yt-dlp JSON output", level: .warning)
             return nil
         }
         
         let title = json["title"] as? String ?? ""
-        guard !title.isEmpty else { return nil }
+        guard !title.isEmpty else {
+            Logger.shared.log("yt-dlp JSON has empty title", level: .warning)
+            return nil
+        }
         
-        // "thumbnail" is the best single thumbnail URL yt-dlp picks
         let thumbnail = (json["thumbnail"] as? String).flatMap { URL(string: $0) }
-        
         let channel = json["channel"] as? String ?? json["uploader"] as? String
         
-        // duration comes as Double from yt-dlp (e.g. 64.027)
         let duration: Int?
         if let d = json["duration"] as? Double {
             duration = Int(d)
@@ -196,7 +156,6 @@ actor ProcessExecutor {
             duration = nil
         }
         
-        // filesize_approx is Int64 or Double depending on site
         let fileSize: Int64?
         if let fs = json["filesize_approx"] as? Int64 {
             fileSize = fs
@@ -208,37 +167,28 @@ actor ProcessExecutor {
             fileSize = nil
         }
         
+        let actualHeight: Int?
+        if let height = json["height"] as? Int {
+            actualHeight = height
+        } else if let formats = json["formats"] as? [[String: Any]] {
+            let heights = formats.compactMap { $0["height"] as? Int }.filter { $0 > 0 }
+            actualHeight = heights.max()
+        } else {
+            actualHeight = nil
+        }
+        
+        Logger.shared.log("Extracted metadata for \(url): title=\(title), thumbnail=\(thumbnail?.absoluteString ?? "nil")", level: .debug)
+        
         return VideoMetadata(
             title: title,
             thumbnailURL: thumbnail,
             channelName: channel,
             duration: duration,
-            fileSize: fileSize
+            fileSize: fileSize,
+            actualHeight: actualHeight
         )
     }
     
-    /// Executes yt-dlp to download a video with specified quality and progress tracking.
-    ///
-    /// This method constructs and executes a yt-dlp command with the following flags:
-    /// - `--format`: Quality selector based on VideoQuality.ytdlpFormat
-    /// - `--merge-output-format mp4`: Force MP4 container (for video)
-    /// - `--extract-audio --audio-format mp3`: Extract audio only (for MP3)
-    /// - `--output`: Target file path
-    /// - `--progress`: Enable progress output
-    /// - `--newline`: Force newline-delimited progress (easier parsing)
-    /// - `--no-mtime`: Don't set file modification time from video metadata
-    /// - `--prefer-free-formats`: Prefer open codecs when available
-    ///
-    /// - Parameters:
-    ///   - url: The video URL to download
-    ///   - quality: The desired video quality
-    ///   - format: The desired output format (MP4 or MP3)
-    ///   - outputPath: The destination directory for the downloaded file
-    ///   - progressHandler: Closure called on each progress update
-    /// - Returns: ProcessResult containing exit code, output path, and any errors
-    /// - Throws: DownloadError if execution fails or produces errors
-    ///
-    /// Validates: Requirements 4.1, 4.2, 4.3, 4.4, 15.1, 15.2
     func execute(
         url: String,
         quality: VideoQuality,
@@ -246,13 +196,11 @@ actor ProcessExecutor {
         outputPath: URL,
         progressHandler: @escaping (DownloadProgress) -> Void
     ) async throws -> ProcessResult {
-        // Construct yt-dlp command arguments
-        let outputTemplate = outputPath.appendingPathComponent("%(title)s.%(ext)s").path
+        let outputTemplate = outputPath.appendingPathComponent("%(title)s_%(height)sp.%(ext)s").path
         
         var arguments: [String]
         
         if format == .mp3 {
-            // Audio-only: extract audio and convert to MP3
             arguments = [
                 "--format", "bestaudio[ext=m4a]/bestaudio",
                 "--extract-audio",
@@ -262,10 +210,10 @@ actor ProcessExecutor {
                 "--output", outputTemplate,
                 "--progress",
                 "--newline",
-                "--no-mtime"
+                "--no-mtime",
+                "--print", "after_move:%(height)s"
             ]
         } else {
-            // Video: use quality-based format selection with MP4 container
             arguments = [
                 "--format", quality.ytdlpFormat,
                 "--merge-output-format", "mp4",
@@ -273,11 +221,11 @@ actor ProcessExecutor {
                 "--output", outputTemplate,
                 "--progress",
                 "--newline",
-                "--no-mtime"
+                "--no-mtime",
+                "--print", "after_move:%(height)s"
             ]
         }
         
-        // Add ffmpeg location if available (check app bundle, then common system paths)
         let appSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         let bundledFFmpeg = appSupportDir.appendingPathComponent("4Kly").appendingPathComponent("ffmpeg").path
         let ffmpegPaths = [
@@ -293,31 +241,26 @@ actor ProcessExecutor {
         
         arguments.append(url)
         
-        // Create and configure process
         let process = Process()
         process.executableURL = binaryPath
         process.arguments = arguments
         
-        // Setup stdout pipe for progress tracking
         let stdoutPipe = Pipe()
         process.standardOutput = stdoutPipe
         
-        // Setup stderr pipe for error capture
         let stderrPipe = Pipe()
         process.standardError = stderrPipe
         
-        // Track the actual output file path
         var actualOutputPath: URL?
+        var actualHeight: Int?
         
-        // File handles for reading process output
         let stdoutHandle = stdoutPipe.fileHandleForReading
         let stderrHandle = stderrPipe.fileHandleForReading
         
-        // Launch process
         do {
             let progressParserRef = self.progressParser
+            var allStdout = ""
             
-            // Set up stdout reading for real-time progress
             stdoutHandle.readabilityHandler = { handle in
                 let data = handle.availableData
                 guard !data.isEmpty else {
@@ -326,6 +269,7 @@ actor ProcessExecutor {
                 }
                 
                 if let output = String(data: data, encoding: .utf8) {
+                    allStdout += output
                     let lines = output.components(separatedBy: .newlines)
                     for line in lines {
                         if let progress = progressParserRef.parse(from: line) {
@@ -335,7 +279,6 @@ actor ProcessExecutor {
                 }
             }
             
-            // Read stderr in background
             var stderrData = Data()
             stderrHandle.readabilityHandler = { handle in
                 let data = handle.availableData
@@ -346,7 +289,6 @@ actor ProcessExecutor {
                 }
             }
             
-            // Set termination handler BEFORE run() to avoid race condition
             let exitCode: Int32 = await withCheckedContinuation { continuation in
                 process.terminationHandler = { proc in
                     continuation.resume(returning: proc.terminationStatus)
@@ -358,22 +300,27 @@ actor ProcessExecutor {
                 }
             }
             
-            // Store/remove process reference
             let processID = process.processIdentifier
             activeProcesses.removeValue(forKey: processID)
             
-            // Clean up handlers
             stdoutHandle.readabilityHandler = nil
             stderrHandle.readabilityHandler = nil
             
             let stderrOutput = String(data: stderrData, encoding: .utf8) ?? ""
             
-            // Determine actual output path from successful download
+            let lines = allStdout.components(separatedBy: .newlines)
+            for line in lines.reversed() {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let height = Int(trimmed), height > 0 && height < 10000 {
+                    actualHeight = height
+                    break
+                }
+            }
+            
             if exitCode == 0 {
                 actualOutputPath = try await findDownloadedFile(in: outputPath)
             }
             
-            // Handle non-zero exit codes
             if exitCode != 0 {
                 throw parseDownloadError(from: stderrOutput, exitCode: exitCode)
             }
@@ -381,7 +328,8 @@ actor ProcessExecutor {
             return ProcessResult(
                 exitCode: exitCode,
                 outputPath: actualOutputPath,
-                error: stderrOutput.isEmpty ? nil : stderrOutput
+                error: stderrOutput.isEmpty ? nil : stderrOutput,
+                actualHeight: actualHeight
             )
             
         } catch let error as DownloadError {
@@ -391,27 +339,14 @@ actor ProcessExecutor {
         }
     }
     
-    /// Cancels an active process by process ID.
-    /// - Parameter processID: The process identifier to cancel
-    /// - Throws: DownloadError if process cannot be cancelled
     func cancel(processID: Int32) async throws {
         guard let process = activeProcesses[processID] else {
             throw DownloadError.ytdlpError(stderr: "Process not found: \(processID)")
         }
-        
-        // Send SIGTERM for graceful termination
         process.terminate()
-        
-        // Remove from active processes
         activeProcesses.removeValue(forKey: processID)
     }
     
-    // MARK: - Private Methods
-    
-    /// Finds the downloaded file in the output directory.
-    ///
-    /// Since yt-dlp uses template variables like %(title)s, we need to search
-    /// for the most recently created file in the output directory.
     private func findDownloadedFile(in directory: URL) async throws -> URL? {
         let fileManager = FileManager.default
         
@@ -422,13 +357,11 @@ actor ProcessExecutor {
                 options: [.skipsHiddenFiles]
             )
             
-            // Filter for video/audio files (mp4, webm, mkv, mp3, m4a)
             let mediaExtensions = ["mp4", "webm", "mkv", "mp3", "m4a"]
             let videoFiles = contents.filter { url in
                 mediaExtensions.contains(url.pathExtension.lowercased())
             }
             
-            // Find the most recently created file
             let sortedFiles = videoFiles.sorted { file1, file2 in
                 let date1 = (try? file1.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? Date.distantPast
                 let date2 = (try? file2.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? Date.distantPast
@@ -441,7 +374,6 @@ actor ProcessExecutor {
         }
     }
     
-    /// Parses stderr output to create appropriate DownloadError.
     private func parseDownloadError(from stderr: String, exitCode: Int32) -> DownloadError {
         let lowercased = stderr.lowercased()
         

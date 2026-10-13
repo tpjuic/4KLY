@@ -26,7 +26,16 @@ struct DownloadJob: Identifiable, Codable {
     var duration: Int?             // Duration in seconds
     var fileSize: Int64?           // Estimated file size in bytes
     
-    init(id: UUID = UUID(), url: String, title: String = "", quality: VideoQuality, format: DownloadFormat = .mp4, status: DownloadStatus = .queued, progress: DownloadProgress? = nil, createdAt: Date = Date(), completedAt: Date? = nil, outputPath: URL? = nil, errorMessage: String? = nil, thumbnailURL: URL? = nil, channelName: String? = nil, duration: Int? = nil, fileSize: Int64? = nil) {
+    /// Actual video height downloaded (e.g., 480, 720, 1080)
+    /// May differ from requested quality if video doesn't have that resolution
+    /// Used to show real quality for non-YouTube sites (Facebook, Twitter, etc.)
+    var actualHeight: Int?
+    
+    // Playlist grouping (nil for single-video downloads)
+    var playlistGroupID: UUID? = nil
+    var playlistIndex: Int? = nil
+    
+    init(id: UUID = UUID(), url: String, title: String = "", quality: VideoQuality, format: DownloadFormat = .mp4, status: DownloadStatus = .queued, progress: DownloadProgress? = nil, createdAt: Date = Date(), completedAt: Date? = nil, outputPath: URL? = nil, errorMessage: String? = nil, thumbnailURL: URL? = nil, channelName: String? = nil, duration: Int? = nil, fileSize: Int64? = nil, actualHeight: Int? = nil, playlistGroupID: UUID? = nil, playlistIndex: Int? = nil) {
         self.id = id
         self.url = url
         self.title = title
@@ -42,5 +51,8 @@ struct DownloadJob: Identifiable, Codable {
         self.channelName = channelName
         self.duration = duration
         self.fileSize = fileSize
+        self.actualHeight = actualHeight
+        self.playlistGroupID = playlistGroupID
+        self.playlistIndex = playlistIndex
     }
 }

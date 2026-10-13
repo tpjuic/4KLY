@@ -52,20 +52,27 @@ struct DownloadRowView: View {
                             .truncationMode(.middle)
                     }
                     
-                    // Channel info
-                    if let channel = download.channelName {
-                        Text(channel)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                    
-                    // Quality, format, and file size badges
+                    // Channel info + Quality + Format + File size - ALL ON ONE LINE
                     HStack(spacing: 6) {
+                        if let channel = download.channelName {
+                            Text(channel)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                            
+                            Text("·")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.5))
+                        }
+                        
                         qualityBadge
                         formatBadge
                         
                         if let fileSize = download.fileSize {
+                            Text("·")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.5))
+                            
                             Text(formattedBytes(fileSize))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -195,7 +202,7 @@ struct DownloadRowView: View {
     // MARK: - Badges
 
     private var qualityBadge: some View {
-        Text(download.quality.displayName.components(separatedBy: " ").first ?? "720p")
+        Text(download.displayQuality)
             .font(.system(size: 10, weight: .semibold))
             .foregroundColor(.blue)
             .padding(.horizontal, 6)
@@ -456,35 +463,6 @@ struct DownloadRowView: View {
     .padding()
 }
 
-#Preview("Indeterminate") {
-    DownloadRowView(
-        download: DownloadJobViewModel(from: DownloadJob(
-            id: UUID(),
-            url: "https://www.youtube.com/watch?v=abc123",
-            title: "",
-            quality: .standard720p,
-            status: .active(progress: DownloadProgress(
-                percentage: 0,
-                downloadedBytes: 0,
-                totalBytes: 0,
-                speed: 0,
-                eta: 0
-            )),
-            progress: DownloadProgress(
-                percentage: 0,
-                downloadedBytes: 0,
-                totalBytes: 0,
-                speed: 0,
-                eta: 0
-            ),
-            createdAt: Date()
-        )),
-        onCancel: {}
-    )
-    .frame(width: 600)
-    .padding()
-}
-
 #Preview("Queued") {
     DownloadRowView(
         download: DownloadJobViewModel(from: DownloadJob(
@@ -496,23 +474,6 @@ struct DownloadRowView: View {
             channelName: "jawed",
             duration: 19,
             fileSize: 4_100_000
-        )),
-        onCancel: {}
-    )
-    .frame(width: 600)
-    .padding()
-}
-
-#Preview("Failed") {
-    DownloadRowView(
-        download: DownloadJobViewModel(from: DownloadJob(
-            id: UUID(),
-            url: "https://www.youtube.com/watch?v=invalid",
-            title: "Unavailable Video",
-            quality: .standard720p,
-            status: .failed(error: "This video is unavailable"),
-            createdAt: Date(),
-            errorMessage: "This video is unavailable"
         )),
         onCancel: {}
     )

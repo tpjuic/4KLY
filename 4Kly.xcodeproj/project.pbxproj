@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D662825E301CB4B4003BAC40 /* YTMac */ = {
+		D662825E301CB4B4003BAC40 /* 4Kly */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = 4Kly;
 			sourceTree = "<group>";
@@ -32,7 +32,7 @@
 		D6628253301CB4B4003BAC40 = {
 			isa = PBXGroup;
 			children = (
-				D662825E301CB4B4003BAC40 /* YTMac */,
+				D662825E301CB4B4003BAC40 /* 4Kly */,
 				D662825D301CB4B4003BAC40 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D662825B301CB4B4003BAC40 /* YTMac */ = {
+		D662825B301CB4B4003BAC40 /* 4Kly */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D662826B301CB4B5003BAC40 /* Build configuration list for PBXNativeTarget "YTMac" */;
+			buildConfigurationList = D662826B301CB4B5003BAC40 /* Build configuration list for PBXNativeTarget "4Kly" */;
 			buildPhases = (
 				D6628258301CB4B4003BAC40 /* Sources */,
 				D6628259301CB4B4003BAC40 /* Frameworks */,
@@ -61,7 +61,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				D662825E301CB4B4003BAC40 /* YTMac */,
+				D662825E301CB4B4003BAC40 /* 4Kly */,
 			);
 			name = 4Kly;
 			packageProductDependencies = (
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D6628257301CB4B4003BAC40 /* Build configuration list for PBXProject "YTMac" */;
+			buildConfigurationList = D6628257301CB4B4003BAC40 /* Build configuration list for PBXProject "4Kly" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D662825B301CB4B4003BAC40 /* YTMac */,
+				D662825B301CB4B4003BAC40 /* 4Kly */,
 			);
 		};
 /* End PBXProject section */
@@ -302,7 +302,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D6628257301CB4B4003BAC40 /* Build configuration list for PBXProject "YTMac" */ = {
+		D6628257301CB4B4003BAC40 /* Build configuration list for PBXProject "4Kly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D6628269301CB4B5003BAC40 /* Debug */,
@@ -311,7 +311,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D662826B301CB4B5003BAC40 /* Build configuration list for PBXNativeTarget "YTMac" */ = {
+		D662826B301CB4B5003BAC40 /* Build configuration list for PBXNativeTarget "4Kly" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D662826C301CB4B5003BAC40 /* Debug */,

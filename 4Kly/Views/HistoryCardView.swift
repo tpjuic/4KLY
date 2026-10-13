@@ -42,16 +42,34 @@ struct HistoryCardView: View {
                         .truncationMode(.middle)
                 }
 
-                // Quality badge, format badge, and relative date
-                HStack(spacing: DesignConstants.relatedSpacing) {
+                // Quality badge, format badge, file size, and relative date - ALL ON ONE LINE
+                HStack(spacing: 6) {
                     qualityBadge
                     formatBadge
+                    
+                    if let outputPath = item.outputPath {
+                        let fileSize = formattedFileSize(path: outputPath)
+                        if !fileSize.isEmpty {
+                            Text("·")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.5))
+                            
+                            Text(fileSize)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Text("·")
+                        .font(.caption)
+                        .foregroundColor(.secondary.opacity(0.5))
+                    
                     Text(relativeDate)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
-                // Status-specific content — only completed items show here
+                // Action buttons for completed downloads
                 completedActions
             }
 
@@ -149,15 +167,11 @@ struct HistoryCardView: View {
 
     // MARK: - Completed Actions
 
-    /// File size, play button, and reveal in Finder for completed downloads
+    /// Play button and reveal in Finder for completed downloads
+    @ViewBuilder
     private var completedActions: some View {
-        HStack(spacing: DesignConstants.relatedSpacing) {
-            if let outputPath = item.outputPath {
-                // File size
-                Text(formattedFileSize(path: outputPath))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
+        if let outputPath = item.outputPath {
+            HStack(spacing: DesignConstants.relatedSpacing) {
                 Spacer()
 
                 // Play button
