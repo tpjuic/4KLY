@@ -44,7 +44,8 @@ class ConfigurationService {
             if let urlString = defaults.string(forKey: UserDefaultsKey.upgradeURL.rawValue) {
                 return URL(string: urlString)
             }
-            return nil
+            // Default to 4kly.com pricing page
+            return URL(string: "https://4kly.com/#pricing")
         }
         set {
             defaults.set(newValue?.absoluteString, forKey: UserDefaultsKey.upgradeURL.rawValue)
