@@ -85,7 +85,7 @@ Requires Xcode 15+ and macOS 14+.
 
 ## Premium
 
-Want 4K downloads and no rate limits? [Upgrade to Premium →](https://4kly.app/premium)
+Want 4K downloads and no rate limits? [Upgrade to Premium →](https://4kly.com)
 
 Your purchase supports independent development.
 

@@ -93,7 +93,7 @@ struct SettingsView: View {
                 }
                 
                 Link("Visit Website",
-                     destination: URL(string: "https://4kly.app")!)
+                     destination: URL(string: "https://4kly.com")!)
                 
                 Text("Powered by yt-dlp")
                     .font(.caption)
@@ -106,7 +106,7 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Link("Support development with Premium →",
-                         destination: URL(string: "https://4kly.app/premium")!)
+                         destination: URL(string: "https://4kly.com")!)
                         .font(.caption)
                 }
             }
