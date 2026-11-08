@@ -45,7 +45,7 @@ class ConfigurationService {
                 return URL(string: urlString)
             }
             // Default to 4kly.com pricing page
-            return URL(string: "https://4kly.com/#pricing")
+            return URL(string: "https://4kly.com/")
         }
         set {
             defaults.set(newValue?.absoluteString, forKey: UserDefaultsKey.upgradeURL.rawValue)
